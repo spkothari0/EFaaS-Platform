@@ -1,0 +1,217 @@
+version: '3.9'
+
+services:
+  # PostgreSQL Instances (Database-per-Service Pattern)
+  postgres-tenant:
+    image: postgres:16-alpine
+    container_name: efaas-postgres-tenant
+    environment:
+      POSTGRES_DB: tenants_db
+      POSTGRES_USER: efaas
+      POSTGRES_PASSWORD: dev_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-tenant-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U efaas -d tenants_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - efaas-network
+
+  postgres-payment:
+    image: postgres:16-alpine
+    container_name: efaas-postgres-payment
+    environment:
+      POSTGRES_DB: payments_db
+      POSTGRES_USER: efaas
+      POSTGRES_PASSWORD: dev_password
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-payment-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U efaas -d payments_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - efaas-network
+
+  postgres-lending:
+    image: postgres:16-alpine
+    container_name: efaas-postgres-lending
+    environment:
+      POSTGRES_DB: lending_db
+      POSTGRES_USER: efaas
+      POSTGRES_PASSWORD: dev_password
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres-lending-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U efaas -d lending_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - efaas-network
+
+  postgres-investment:
+    image: postgres:16-alpine
+    container_name: efaas-postgres-investment
+    environment:
+      POSTGRES_DB: investments_db
+      POSTGRES_USER: efaas
+      POSTGRES_PASSWORD: dev_password
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres-investment-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U efaas -d investments_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - efaas-network
+
+  postgres-fraud:
+    image: postgres:16-alpine
+    container_name: efaas-postgres-fraud
+    environment:
+      POSTGRES_DB: fraud_db
+      POSTGRES_USER: efaas
+      POSTGRES_PASSWORD: dev_password
+    ports:
+      - "5437:5432"
+    volumes:
+      - postgres-fraud-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U efaas -d fraud_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - efaas-network
+
+  # Apache Kafka + Zookeeper (Event Bus)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: efaas-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_INIT_LIMIT: 5
+    ports:
+      - "2181:2181"
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-logs:/var/lib/zookeeper/log
+    healthcheck:
+      test: ["CMD-SHELL", "echo ruok | nc localhost 2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - efaas-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: efaas-kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions.sh --bootstrap-server localhost:9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - efaas-network
+
+  # Redis (Caching & Rate Limiting)
+  redis:
+    image: redis:7-alpine
+    container_name: efaas-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - efaas-network
+
+  # TigerGraph Community Edition (Fraud Detection Knowledge Graph)
+  tigergraph:
+    image: tigergraph/tigergraph-oss:latest
+    container_name: efaas-tigergraph
+    environment:
+      COMPOSE_HTTP_TIMEOUT: 200
+      COMPOSE_REQUEST_TIMEOUT: 200
+      TG_ADMIN: admin
+      TG_PASSWORD: tigergraph
+    ports:
+      - "14240:14240"  # GraphStudio
+      - "9000:9000"    # REST API
+    volumes:
+      - tigergraph-data:/home/tigergraph
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9000/api/ping || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - efaas-network
+    # Increase memory for TigerGraph
+    # Can be adjusted based on system resources
+    # ulimits:
+    #   memlock: -1
+    #   nproc: 65535
+    #   nofile: 65535
+
+volumes:
+  postgres-tenant-data:
+    driver: local
+  postgres-payment-data:
+    driver: local
+  postgres-lending-data:
+    driver: local
+  postgres-investment-data:
+    driver: local
+  postgres-fraud-data:
+    driver: local
+  zookeeper-data:
+    driver: local
+  zookeeper-logs:
+    driver: local
+  kafka-data:
+    driver: local
+  redis-data:
+    driver: local
+  tigergraph-data:
+    driver: local
+
+networks:
+  efaas-network:
+    driver: bridge
