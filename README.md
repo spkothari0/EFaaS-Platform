@@ -145,14 +145,14 @@ Response contains:
 ```json
 {
   "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-  "key": "sk_live_abcdef123456...",  // Store securely
-  "maskedKey": "sk_live_...a5c9b"
+  "key": "efaas_live_abcdef123456...",  // Store securely
+  "maskedKey": "efaas_live_...a5c9b"
 }
 ```
 
 ### Using API Key
 ```bash
-curl -H "X-API-Key: sk_live_abcdef123456..." \
+curl -H "X-API-Key: efaas_live_abcdef123456..." \
   http://localhost:8080/api/v1/payments
 ```
 

@@ -37,7 +37,7 @@ public class ApiKey {
     private String keyHash;  // SHA-256 hash of the API key
 
     @Column(name = "masked_key", nullable = false, length = 32)
-    private String maskedKey;  // e.g., "sk_live_***...a5c9b"
+    private String maskedKey;  // e.g., "efaas_live_***...a5c9b"
 
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
@@ -65,7 +65,7 @@ public class ApiKey {
 
     /**
      * Helper to create masked version of API key for display.
-     * Example: "sk_live_1234567890...a5c9b" (shows first 11 and last 5 chars)
+     * Example: "efaas_live_1234567890...a5c9b" (shows first 11 and last 5 chars)
      */
     public static String maskKey(String plainKey) {
         if (plainKey == null || plainKey.length() < 16) {

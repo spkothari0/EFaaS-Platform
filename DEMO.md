@@ -6,13 +6,19 @@ This document will contain step-by-step demonstrations of all EFaaS platform fea
 
 ## Table of Contents
 
-- [Tenant Management](#tenant-management)
-- [API Key Generation](#api-key-generation)
-- [Payment Processing](#payment-processing) (Week 3)
-- [Loan Application](#loan-application) (Week 5)
-- [Investment Trading](#investment-trading) (Week 6)
-- [Fraud Detection](#fraud-detection) (Week 7)
-- [End-to-End Flow](#end-to-end-flow)
+- [EFaaS Demo Walkthrough](#efaas-demo-walkthrough)
+  - [Table of Contents](#table-of-contents)
+  - [Tenant Management](#tenant-management)
+    - [1. Create a Tenant](#1-create-a-tenant)
+    - [2. Retrieve Tenant](#2-retrieve-tenant)
+  - [API Key Generation](#api-key-generation)
+    - [3. Generate API Key](#3-generate-api-key)
+    - [4. List API Keys](#4-list-api-keys)
+  - [Payment Processing](#payment-processing)
+  - [Loan Application](#loan-application)
+  - [Investment Trading](#investment-trading)
+  - [Fraud Detection](#fraud-detection)
+  - [End-to-End Flow](#end-to-end-flow)
 
 ## Tenant Management
 
@@ -46,7 +52,7 @@ Save the `id` for subsequent requests.
 ### 2. Retrieve Tenant
 
 ```bash
-TENANT_ID="f47ac10b-58cc-4372-a567-0e02b2c3d479"
+TENANT_ID="some-uid"
 
 curl -X GET http://localhost:8080/api/v1/tenants/$TENANT_ID \
   -H "Content-Type: application/json"
@@ -66,9 +72,9 @@ curl -X POST http://localhost:8080/api/v1/tenants/$TENANT_ID/api-keys
 ```json
 {
   "id": "a1b2c3d4-e5f6-47g8-h9i0-j1k2l3m4n5o6",
-  "tenantId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-  "key": "sk_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",  // Store securely!
-  "maskedKey": "sk_live_4Z8w...S0T1",
+  "tenantId": "some-uid",
+  "key": "efaas_live_some-uid",  // Store securely!
+  "maskedKey": "efaas_live_4Z8w...S0T1",
   "active": true,
   "createdAt": "2024-03-19T10:16:45Z"
 }

@@ -32,7 +32,7 @@ public class ApiKeyService {
 
     private final ApiKeyRepository apiKeyRepository;
     private final TenantRepository tenantRepository;
-    private static final String API_KEY_PREFIX = "sk_live_";
+    private static final String API_KEY_PREFIX = "efaas_live_";
     private static final int API_KEY_LENGTH = 32;  // 32 random bytes = 43 Base64 chars
 
     /**

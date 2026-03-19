@@ -10,7 +10,7 @@ import java.util.UUID;
 
 /**
  * API Key DTO. Note: The plaintext key is only returned on creation.
- * The maskedKey is shown in responses for security (e.g., "sk_live_...2a5c9b").
+ * The maskedKey is shown in responses for security (e.g., "efaas_live_...2a5c9b").
  */
 @Data
 @Builder
