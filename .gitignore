@@ -1,0 +1,63 @@
+# Build artifacts
+target/
+build/
+*.jar
+*.war
+*.tar.gz
+*.zip
+*.class
+
+# IDE & Editor
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.sublime-workspace
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+application-local.yml
+application-*.properties
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Maven
+.m2/
+dependency-reduced-pom.xml
+pom.xml.tag
+pom.xml.releaseBackup
+
+# Gradle
+.gradle/
+gradle-app.setting
+
+# Node (for future frontend)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# IDE run configurations
+.run/
+
+# OS
+.AppleDouble
+.LSOverride
+
+# Temporary files
+*.tmp
+*.bak
