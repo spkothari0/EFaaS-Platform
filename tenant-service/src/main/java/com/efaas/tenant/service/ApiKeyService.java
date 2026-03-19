@@ -40,7 +40,7 @@ public class ApiKeyService {
      * Returns the plaintext key only once - it must be stored securely by the client.
      */
     public ApiKeyDTO generateApiKey(UUID tenantId) {
-        Tenant tenant = tenantRepository.findById(tenantId)
+        tenantRepository.findById(tenantId)
             .orElseThrow(() -> new TenantNotFoundException(tenantId.toString()));
 
         // Generate plaintext key (never stored)
