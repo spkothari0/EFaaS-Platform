@@ -67,7 +67,7 @@ curl -X POST http://localhost:8080/api/v1/tenants/$TENANT_ID/api-keys
 {
   "id": "a1b2c3d4-e5f6-47g8-h9i0-j1k2l3m4n5o6",
   "tenantId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-  "key": "sk_live_4Z8wQjhKmFpR9TvWxYzAbCdEfGhIjK2L3M4N5O6P7Q8R9S0T1U2V3W4",  // Store securely!
+  "key": "sk_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",  // Store securely!
   "maskedKey": "sk_live_4Z8w...S0T1",
   "active": true,
   "createdAt": "2024-03-19T10:16:45Z"
