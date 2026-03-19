@@ -162,33 +162,28 @@ services:
       - efaas-network
 
   # TigerGraph Community Edition (Fraud Detection Knowledge Graph)
-  tigergraph:
-    image: tigergraph/tigergraph-oss:latest
-    container_name: efaas-tigergraph
-    environment:
-      COMPOSE_HTTP_TIMEOUT: 200
-      COMPOSE_REQUEST_TIMEOUT: 200
-      TG_ADMIN: admin
-      TG_PASSWORD: tigergraph
-    ports:
-      - "14240:14240"  # GraphStudio
-      - "9000:9000"    # REST API
-    volumes:
-      - tigergraph-data:/home/tigergraph
-    healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:9000/api/ping || exit 1"]
-      interval: 15s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    networks:
-      - efaas-network
-    # Increase memory for TigerGraph
-    # Can be adjusted based on system resources
-    # ulimits:
-    #   memlock: -1
-    #   nproc: 65535
-    #   nofile: 65535
+  # NOTE: Commented out — requires Docker Hub login (docker login) before pulling.
+  # tigergraph:
+  #   image: tigergraph/tigergraph-oss:latest
+  #   container_name: efaas-tigergraph
+  #   environment:
+  #     COMPOSE_HTTP_TIMEOUT: 200
+  #     COMPOSE_REQUEST_TIMEOUT: 200
+  #     TG_ADMIN: admin
+  #     TG_PASSWORD: tigergraph
+  #   ports:
+  #     - "14240:14240"  # GraphStudio
+  #     - "9000:9000"    # REST API
+  #   volumes:
+  #     - tigergraph-data:/home/tigergraph
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl -s http://localhost:9000/api/ping || exit 1"]
+  #     interval: 15s
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 30s
+  #   networks:
+  #     - efaas-network
 
 volumes:
   postgres-tenant-data:
@@ -215,3 +210,8 @@ volumes:
 networks:
   efaas-network:
     driver: bridge
+
+
+# Docker run: docker-compose up -d
+# Docker stop: docker-compose down
+# Docker remove volumes: docker-compose down -v

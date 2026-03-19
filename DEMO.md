@@ -151,4 +151,4 @@ curl -X GET http://localhost:8080/api/v1/tenants/$TENANT_ID/api-keys
 
 ---
 
-**Last Updated**: March 2024 | **Next**: Week 2 (Gateway Hardening)
+**Last Updated**: March 2026 | **Next**: Week 2 (Gateway Hardening)

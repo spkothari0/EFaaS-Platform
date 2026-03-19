@@ -9,12 +9,12 @@
         <groupId>com.efaas</groupId>
         <artifactId>efaas-platform</artifactId>
         <version>0.1.0-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>fraud-service</artifactId>
     <packaging>jar</packaging>
-    <name>Fraud & Risk Intelligence Service</name>
+    <name>Fraud and Risk Intelligence Service</name>
     <description>Fraud detection using TigerGraph knowledge graph, risk scoring, AML patterns</description>
 
     <dependencies>
@@ -25,7 +25,19 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- PostgeSQL (for caching/reference data) -->
+        <!-- Web MVC -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Spring Data JPA -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- PostgreSQL (for caching/reference data) -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -38,10 +50,10 @@
             <artifactId>spring-kafka</artifactId>
         </dependency>
 
-        <!-- HTTP client for TigerGraph REST API -->
+        <!-- WebClient for TigerGraph REST API (reactive client only, not reactive server) -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webflux</artifactId>
         </dependency>
 
         <!-- Actuator -->

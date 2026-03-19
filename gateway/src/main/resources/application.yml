@@ -6,14 +6,11 @@ spring:
     gateway:
       routes:
         - id: tenant-service
-          uri: http://tenant-service:8081
+          uri: http://localhost:8081
           predicates:
             - Path=/api/v1/tenants/**
           filters:
             - StripPrefix=2
-      # Global filters
-      default-filters:
-        - name: RequestLogging
       globalcors:
         corsConfigurations:
           '[/**]':
