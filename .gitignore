@@ -61,3 +61,7 @@ docker-compose.override.yml
 # Temporary files
 *.tmp
 *.bak
+
+# Claude AI related files
+.claude/
+
