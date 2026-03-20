@@ -6,6 +6,7 @@ import com.efaas.tenant.domain.Tenant;
 import com.efaas.tenant.service.ApiKeyService;
 import com.efaas.tenant.service.TenantService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -57,7 +58,7 @@ public class TenantController {
         @ApiResponse(responseCode = "200", description = "Tenant found"),
         @ApiResponse(responseCode = "404", description = "Tenant not found")
     })
-    public ResponseEntity<TenantDTO> getTenant(@PathVariable UUID id) {
+    public ResponseEntity<TenantDTO> getTenant(@Parameter(description = "Tenant ID", required = true) @PathVariable("id") UUID id) {
         log.debug("Fetching tenant: id={}", id);
         TenantDTO tenant = tenantService.getTenant(id);
         return ResponseEntity.ok(tenant);
@@ -69,7 +70,7 @@ public class TenantController {
         @ApiResponse(responseCode = "200", description = "Tenant updated"),
         @ApiResponse(responseCode = "404", description = "Tenant not found")
     })
-    public ResponseEntity<TenantDTO> updateTenant(@PathVariable UUID id, @Valid @RequestBody UpdateTenantRequest request) {
+    public ResponseEntity<TenantDTO> updateTenant(@Parameter(description = "Tenant ID", required = true) @PathVariable("id") UUID id, @Valid @RequestBody UpdateTenantRequest request) {
         log.info("Updating tenant: id={}", id);
         TenantDTO tenant = tenantService.updateTenant(
             id,
@@ -86,7 +87,7 @@ public class TenantController {
         @ApiResponse(responseCode = "204", description = "Tenant deleted"),
         @ApiResponse(responseCode = "404", description = "Tenant not found")
     })
-    public ResponseEntity<Void> deleteTenant(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteTenant(@Parameter(description = "Tenant ID", required = true) @PathVariable("id") UUID id) {
         log.info("Deleting tenant: id={}", id);
         tenantService.deleteTenant(id);
         return ResponseEntity.noContent().build();
@@ -98,7 +99,7 @@ public class TenantController {
         @ApiResponse(responseCode = "201", description = "API key generated (store securely - won't be shown again)"),
         @ApiResponse(responseCode = "404", description = "Tenant not found")
     })
-    public ResponseEntity<ApiKeyDTO> generateApiKey(@PathVariable UUID id) {
+    public ResponseEntity<ApiKeyDTO> generateApiKey(@Parameter(description = "Tenant ID", required = true) @PathVariable("id") UUID id) {
         log.info("Generating API key for tenant: tenantId={}", id);
         ApiKeyDTO apiKey = apiKeyService.generateApiKey(id);
         return ResponseEntity.status(HttpStatus.CREATED).body(apiKey);
@@ -110,7 +111,7 @@ public class TenantController {
         @ApiResponse(responseCode = "200", description = "List of active API keys"),
         @ApiResponse(responseCode = "404", description = "Tenant not found")
     })
-    public ResponseEntity<List<ApiKeyDTO>> listApiKeys(@PathVariable UUID id) {
+    public ResponseEntity<List<ApiKeyDTO>> listApiKeys(@Parameter(description = "Tenant ID", required = true) @PathVariable("id") UUID id) {
         log.debug("Listing API keys for tenant: tenantId={}", id);
         // Verify tenant exists
         tenantService.getTenant(id);
@@ -124,7 +125,7 @@ public class TenantController {
         @ApiResponse(responseCode = "204", description = "API key revoked"),
         @ApiResponse(responseCode = "404", description = "API key not found")
     })
-    public ResponseEntity<Void> revokeApiKey(@PathVariable UUID keyId) {
+    public ResponseEntity<Void> revokeApiKey(@Parameter(description = "API Key ID", required = true) @PathVariable("keyId") UUID keyId) {
         log.info("Revoking API key: keyId={}", keyId);
         apiKeyService.revokeApiKey(keyId);
         return ResponseEntity.noContent().build();

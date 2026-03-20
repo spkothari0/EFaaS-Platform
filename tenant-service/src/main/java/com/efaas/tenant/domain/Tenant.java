@@ -29,6 +29,7 @@ public class Tenant {
 
     @Id
     @Column(columnDefinition = "UUID")
+    @Builder.Default
     private UUID id = UUID.randomUUID();
 
     @Column(nullable = false, length = 100)
@@ -42,6 +43,7 @@ public class Tenant {
     private PlanTier plan;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean active = true;
 
     @CreationTimestamp

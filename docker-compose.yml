@@ -161,6 +161,26 @@ services:
     networks:
       - efaas-network
 
+  # pgAdmin (Database GUI)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: efaas-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@efaas.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres-tenant
+      - postgres-payment
+      - postgres-lending
+      - postgres-investment
+      - postgres-fraud
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - efaas-network
+
   # TigerGraph Community Edition (Fraud Detection Knowledge Graph)
   # NOTE: Commented out — requires Docker Hub login (docker login) before pulling.
   # tigergraph:
@@ -203,6 +223,8 @@ volumes:
   kafka-data:
     driver: local
   redis-data:
+    driver: local
+  pgadmin-data:
     driver: local
   tigergraph-data:
     driver: local

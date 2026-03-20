@@ -28,6 +28,7 @@ public class ApiKey {
 
     @Id
     @Column(columnDefinition = "UUID")
+    @Builder.Default
     private UUID id = UUID.randomUUID();
 
     @Column(name = "tenant_id", nullable = false, columnDefinition = "UUID")

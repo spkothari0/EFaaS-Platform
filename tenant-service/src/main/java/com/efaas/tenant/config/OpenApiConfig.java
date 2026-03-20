@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
         title = "Tenant Service API",
         version = "v1",
         description = "Tenant CRUD, API key generation and management, usage metering",
-        contact = @Contact(name = "EFaaS Platform", email = "platform@efaas.io")
+        contact = @Contact(name = "Shreyas Kothari", email = "spkothari968@gmail.com")
     ),
     servers = {
         @Server(url = "http://localhost:8081", description = "Direct"),
