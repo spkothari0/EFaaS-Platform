@@ -21,12 +21,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build and run unit tests
-        run: mvn clean test --no-transfer-progress
-
-      - name: Run integration tests
-        run: mvn verify -Dsurefire.skip=true --no-transfer-progress
-        # -Dsurefire.skip=true skips unit tests (Surefire) but allows Failsafe to run integration tests
+      - name: Build and test
+        run: mvn verify --no-transfer-progress
 
       - name: Upload test reports
         if: always()

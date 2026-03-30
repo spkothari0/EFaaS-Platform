@@ -75,5 +75,7 @@ logging:
   level:
     root: INFO
     com.efaas: DEBUG
+    org.apache.kafka: WARN
+    org.springframework.kafka: WARN
   pattern:
     console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
