@@ -22,20 +22,22 @@ import org.springframework.context.annotation.Configuration;
         @Server(url = "http://localhost:8085", description = "Direct"),
         @Server(url = "http://localhost:8080", description = "Via Gateway")
     },
-    security = @SecurityRequirement(name = "bearerAuth")
-)
-@SecurityScheme(
-    name = "bearerAuth",
-    type = SecuritySchemeType.HTTP,
-    scheme = "bearer",
-    bearerFormat = "JWT",
-    in = SecuritySchemeIn.HEADER
+    security = {
+        @SecurityRequirement(name = "apiKeyAuth"),
+        @SecurityRequirement(name = "bearerAuth")
+    }
 )
 @SecurityScheme(
     name = "apiKeyAuth",
     type = SecuritySchemeType.APIKEY,
     in = SecuritySchemeIn.HEADER,
-    paramName = "X-API-Key"
+    paramName = "X-Api-Key"
+)
+@SecurityScheme(
+    name = "bearerAuth",
+    type = SecuritySchemeType.HTTP,
+    scheme = "bearer",
+    in = SecuritySchemeIn.HEADER
 )
 public class OpenApiConfig {
 }
