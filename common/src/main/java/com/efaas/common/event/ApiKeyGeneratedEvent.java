@@ -1,5 +1,6 @@
 package com.efaas.common.event;
 
+import com.efaas.common.enums.ServiceName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -24,7 +25,7 @@ public class ApiKeyGeneratedEvent extends DomainEvent {
         this.keyId = keyId;
         this.maskedKey = maskedKey;
         this.planTier = planTier;
-        initializeEventMetadata(tenantId.toString(), "tenant-service");
+        initializeEventMetadata(tenantId.toString(), ServiceName.TENANT_SERVICE);
     }
 
     @Override

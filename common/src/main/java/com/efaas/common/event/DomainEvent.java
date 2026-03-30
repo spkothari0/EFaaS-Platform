@@ -1,5 +1,6 @@
 package com.efaas.common.event;
 
+import com.efaas.common.enums.ServiceName;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,13 +23,13 @@ public abstract class DomainEvent {
     private UUID eventId;
     private ZonedDateTime timestamp;
     private String tenantId;
-    private String sourceService;  // e.g., "payment-service", "lending-service"
+    private ServiceName sourceService;
 
     /**
      * Initializes common event fields.
      * Called by subclass constructors to ensure every event has an ID and timestamp.
      */
-    protected void initializeEventMetadata(String tenantId, String sourceService) {
+    protected void initializeEventMetadata(String tenantId, ServiceName sourceService) {
         if (this.eventId == null) {
             this.eventId = UUID.randomUUID();
         }
