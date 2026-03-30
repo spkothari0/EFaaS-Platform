@@ -1,10 +1,13 @@
 package com.efaas.tenant.service;
 
 import com.efaas.common.dto.ApiKeyDTO;
+import com.efaas.common.dto.ApiKeyValidationResponse;
+import com.efaas.common.event.ApiKeyGeneratedEvent;
 import com.efaas.common.exception.InvalidApiKeyException;
 import com.efaas.common.exception.TenantNotFoundException;
 import com.efaas.tenant.domain.ApiKey;
 import com.efaas.tenant.domain.Tenant;
+import com.efaas.tenant.event.TenantEventPublisher;
 import com.efaas.tenant.repository.ApiKeyRepository;
 import com.efaas.tenant.repository.TenantRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +35,7 @@ public class ApiKeyService {
 
     private final ApiKeyRepository apiKeyRepository;
     private final TenantRepository tenantRepository;
+    private final TenantEventPublisher eventPublisher;
     private static final String API_KEY_PREFIX = "efaas_live_";
     private static final int API_KEY_LENGTH = 32;  // 32 random bytes = 43 Base64 chars
 
@@ -57,6 +61,10 @@ public class ApiKeyService {
 
         ApiKey saved = apiKeyRepository.save(apiKey);
         log.info("API key generated for tenant: tenantId={}, keyId={}, maskedKey={}", tenantId, saved.getId(), maskedKey);
+
+        Tenant tenant = tenantRepository.findById(tenantId).orElseThrow();
+        eventPublisher.publishApiKeyGenerated(new ApiKeyGeneratedEvent(
+            tenantId, saved.getId(), maskedKey, tenant.getPlan().name()));
 
         return ApiKeyDTO.builder()
             .id(saved.getId())
@@ -89,6 +97,36 @@ public class ApiKeyService {
 
         log.debug("API key validated for tenant: tenantId={}", apiKey.getTenantId());
         return apiKey.getTenantId();
+    }
+
+    /**
+     * Validate an API key and return the full tenant context.
+     * Used by the API Gateway for rate limiting and header injection.
+     */
+    @Transactional(readOnly = true)
+    public ApiKeyValidationResponse validateForGateway(String plainKey) {
+        if (plainKey == null || plainKey.isBlank()) {
+            throw InvalidApiKeyException.malformed();
+        }
+
+        String keyHash = hashKey(plainKey);
+        ApiKey apiKey = apiKeyRepository.findByKeyHashAndActiveTrue(keyHash)
+            .orElseThrow(InvalidApiKeyException::notFound);
+
+        if (!apiKey.isValid()) {
+            throw InvalidApiKeyException.expired();
+        }
+
+        Tenant tenant = tenantRepository.findById(apiKey.getTenantId())
+            .orElseThrow(() -> new TenantNotFoundException(apiKey.getTenantId().toString()));
+
+        log.debug("Gateway API key validated: tenantId={}, plan={}", tenant.getId(), tenant.getPlan());
+
+        return ApiKeyValidationResponse.builder()
+            .tenantId(tenant.getId())
+            .planTier(tenant.getPlan().name())
+            .rateLimitPerMinute(tenant.getRateLimitPerMinute())
+            .build();
     }
 
     /**
