@@ -181,6 +181,11 @@ services:
     networks:
       - efaas-network
 
+  # goto http://localhost:5050 in your browser and login
+  # click on servers → create server → connection tab
+  # host: efaas-postgres-tenant, username: efaas, password: dev_password, database: tenants_db
+  # repeat for each PostgreSQL instance with appropriate host and database
+
   # TigerGraph Community Edition (Fraud Detection Knowledge Graph)
   # NOTE: Commented out — requires Docker Hub login (docker login) before pulling.
   # tigergraph:

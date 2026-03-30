@@ -41,6 +41,7 @@ public class ApiKey {
     private String maskedKey;  // e.g., "efaas_live_***...a5c9b"
 
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private boolean active = true;
 
     @CreationTimestamp

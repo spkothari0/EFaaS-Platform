@@ -2,82 +2,81 @@ spring:
   application:
     name: api-gateway
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      connect-timeout: 2000
+
   cloud:
     gateway:
-      routes:
-        # ── Business API routes ──────────────────────────────────────────────
-        - id: tenant-service
-          uri: http://localhost:8081
-          predicates:
-            - Path=/api/v1/tenants/**
+      server:
+        webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins: "http://localhost:3000"
+                allowedMethods: GET,POST,PUT,DELETE,OPTIONS
+                allowedHeaders: "*"
+                allowCredentials: true
+                maxAge: 3600
+          routes:
+            # ── Business API routes ──────────────────────────────────────────────
+            - id: tenant-service
+              uri: http://localhost:8081
+              predicates:
+                - Path=/api/v1/tenants,/api/v1/tenants/**
+            # Uncomment as each service is developed and running:
+            # - id: payment-service
+            #   uri: http://localhost:8082
+            #   predicates:
+            #     - Path=/api/v1/payments
+            # - id: lending-service
+            #   uri: http://localhost:8083
+            #   predicates:
+            #     - Path=/api/v1/loans
+            # - id: investment-service
+            #   uri: http://localhost:8084
+            #   predicates:
+            #     - Path=/api/v1/investments
+            # - id: fraud-service
+            #   uri: http://localhost:8085
+            #   predicates:
+            #     - Path=/api/v1/fraud
 
-        # Uncomment as each service is developed and running:
-        # - id: payment-service
-        #   uri: http://localhost:8082
-        #   predicates:
-        #     - Path=/api/v1/payments/**
-
-        # - id: lending-service
-        #   uri: http://localhost:8083
-        #   predicates:
-        #     - Path=/api/v1/loans/**
-
-        # - id: investment-service
-        #   uri: http://localhost:8084
-        #   predicates:
-        #     - Path=/api/v1/investments/**
-
-        # - id: fraud-service
-        #   uri: http://localhost:8085
-        #   predicates:
-        #     - Path=/api/v1/fraud/**
-
-        # ── Swagger / OpenAPI aggregation routes ────────────────────────────
-        # Each route rewrites /v3/api-docs/<service> → service's /api-docs
-        - id: tenant-service-api-docs
-          uri: http://localhost:8081
-          predicates:
-            - Path=/v3/api-docs/tenant-service
-          filters:
-            - RewritePath=/v3/api-docs/tenant-service, /api-docs
-
-        # Uncomment as each service is developed and running:
-        # - id: payment-service-api-docs
-        #   uri: http://localhost:8082
-        #   predicates:
-        #     - Path=/v3/api-docs/payment-service
-        #   filters:
-        #     - RewritePath=/v3/api-docs/payment-service, /api-docs
-
-        # - id: lending-service-api-docs
-        #   uri: http://localhost:8083
-        #   predicates:
-        #     - Path=/v3/api-docs/lending-service
-        #   filters:
-        #     - RewritePath=/v3/api-docs/lending-service, /api-docs
-
-        # - id: investment-service-api-docs
-        #   uri: http://localhost:8084
-        #   predicates:
-        #     - Path=/v3/api-docs/investment-service
-        #   filters:
-        #     - RewritePath=/v3/api-docs/investment-service, /api-docs
-
-        # - id: fraud-service-api-docs
-        #   uri: http://localhost:8085
-        #   predicates:
-        #     - Path=/v3/api-docs/fraud-service
-        #   filters:
-        #     - RewritePath=/v3/api-docs/fraud-service, /api-docs
-
-      globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins: "http://localhost:3000"
-            allowedMethods: GET,POST,PUT,DELETE,OPTIONS
-            allowedHeaders: "*"
-            allowCredentials: true
-            maxAge: 3600
+            # ── Swagger / OpenAPI aggregation routes ────────────────────────────
+            # Each route rewrites /v3/api-docs/<service> → service's /api-docs
+            - id: tenant-service-api-docs
+              uri: http://localhost:8081
+              predicates:
+                - Path=/v3/api-docs/tenant-service
+              filters:
+                - RewritePath=/v3/api-docs/tenant-service, /api-docs
+            # Uncomment as each service is developed and running:
+            # - id: payment-service-api-docs
+            #   uri: http://localhost:8082
+            #   predicates:
+            #     - Path=/v3/api-docs/payment-service
+            #   filters:
+            #     - RewritePath=/v3/api-docs/payment-service, /api-docs
+            # - id: lending-service-api-docs
+            #   uri: http://localhost:8083
+            #   predicates:
+            #     - Path=/v3/api-docs/lending-service
+            #   filters:
+            #     - RewritePath=/v3/api-docs/lending-service, /api-docs
+            # - id: investment-service-api-docs
+            #   uri: http://localhost:8084
+            #   predicates:
+            #     - Path=/v3/api-docs/investment-service
+            #   filters:
+            #     - RewritePath=/v3/api-docs/investment-service, /api-docs
+            # - id: fraud-service-api-docs
+            #   uri: http://localhost:8085
+            #   predicates:
+            #     - Path=/v3/api-docs/fraud-service
+            #   filters:
+            #     - RewritePath=/v3/api-docs/fraud-service, /api-docs
 
 server:
   port: 8080
@@ -90,9 +89,9 @@ management:
   endpoint:
     health:
       show-details: when-authorized
-  metrics:
-    export:
-      prometheus:
+  prometheus:
+    metrics:
+      export:
         enabled: true
 
 # ── Centralized Swagger UI (aggregates all services) ──────────────────────────
@@ -113,6 +112,11 @@ springdoc:
       #   url: /v3/api-docs/investment-service
       # - name: Fraud & Risk Service
       #   url: /v3/api-docs/fraud-service
+
+efaas:
+  gateway:
+    tenant-service-url: http://localhost:8081
+    api-key-cache-ttl-seconds: 300
 
 logging:
   level:

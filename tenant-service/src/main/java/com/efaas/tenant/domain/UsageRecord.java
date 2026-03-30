@@ -28,6 +28,7 @@ public class UsageRecord {
 
     @Id
     @Column(columnDefinition = "UUID")
+    @Builder.Default
     private UUID id = UUID.randomUUID();
 
     @Column(name = "tenant_id", nullable = false, columnDefinition = "UUID")
@@ -37,6 +38,7 @@ public class UsageRecord {
     private String month;  // YearMonth serialized as "2024-03"
 
     @Column(name = "api_calls_used", nullable = false)
+    @Builder.Default
     private long apiCallsUsed = 0;
 
     @CreationTimestamp
