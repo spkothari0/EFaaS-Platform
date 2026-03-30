@@ -20,6 +20,8 @@ EFaaS (Embedded Finance-as-a-Service) is a platform that enables businesses to e
 
 ## 🏗️ Architecture
 
+![alt text](images/architecture.png)
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │         Tenant Business Clients (REST API)              │
@@ -45,6 +47,10 @@ EFaaS (Embedded Finance-as-a-Service) is a platform that enables businesses to e
         PostgreSQL   TigerGraph
         (5 dbs)      (Graph DB)
 ```
+
+**Kafka**
+
+![alt text](images/kafka.png)
 
 **Services:**
 - **Gateway**: Request routing, authentication, rate limiting (port 8080)
