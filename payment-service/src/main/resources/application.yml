@@ -3,7 +3,7 @@ spring:
     name: payment-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/payments_db
+    url: jdbc:postgresql://localhost:5434/payments_db
     username: efaas
     password: dev_password
     driver-class-name: org.postgresql.Driver
@@ -50,6 +50,14 @@ springdoc:
     path: /swagger-ui.html
     operations-sorter: method
     tags-sorter: alpha
+
+stripe:
+  secret-key: ${STRIPE_SECRET_KEY}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+
+kafka:
+  topics:
+    payments: payments-topic
 
 logging:
   level:

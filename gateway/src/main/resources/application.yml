@@ -26,11 +26,10 @@ spring:
               uri: http://localhost:8081
               predicates:
                 - Path=/api/v1/tenants,/api/v1/tenants/**
-            # Uncomment as each service is developed and running:
-            # - id: payment-service
-            #   uri: http://localhost:8082
-            #   predicates:
-            #     - Path=/api/v1/payments
+            - id: payment-service
+              uri: http://localhost:8082
+              predicates:
+                - Path=/api/v1/payments
             # - id: lending-service
             #   uri: http://localhost:8083
             #   predicates:
@@ -52,13 +51,12 @@ spring:
                 - Path=/v3/api-docs/tenant-service
               filters:
                 - RewritePath=/v3/api-docs/tenant-service, /api-docs
-            # Uncomment as each service is developed and running:
-            # - id: payment-service-api-docs
-            #   uri: http://localhost:8082
-            #   predicates:
-            #     - Path=/v3/api-docs/payment-service
-            #   filters:
-            #     - RewritePath=/v3/api-docs/payment-service, /api-docs
+            - id: payment-service-api-docs
+              uri: http://localhost:8082
+              predicates:
+                - Path=/v3/api-docs/payment-service
+              filters:
+                - RewritePath=/v3/api-docs/payment-service, /api-docs
             # - id: lending-service-api-docs
             #   uri: http://localhost:8083
             #   predicates:
@@ -104,8 +102,8 @@ springdoc:
       - name: Tenant Service
         url: /v3/api-docs/tenant-service
       # Uncomment as each service is developed and running:
-      # - name: Payment Service
-      #   url: /v3/api-docs/payment-service
+      - name: Payment Service
+        url: /v3/api-docs/payment-service
       # - name: Lending Service
       #   url: /v3/api-docs/lending-service
       # - name: Investment Service
