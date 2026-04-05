@@ -96,7 +96,8 @@ public class WebhookService {
                         if (payment.getStatus() != PaymentStatus.REFUNDED) {
                             payment.setStatus(PaymentStatus.REFUNDED);
                             paymentRepository.save(payment);
-                            log.info("Payment {} marked REFUNDED via charge.refunded event", payment.getId());
+                            eventPublisher.publishPaymentRefunded(payment);
+                            log.info("Payment {} marked REFUNDED, event published", payment.getId());
                         }
                     },
                     () -> log.warn("No payment record found for Stripe PI: {} (charge.refunded)", id)

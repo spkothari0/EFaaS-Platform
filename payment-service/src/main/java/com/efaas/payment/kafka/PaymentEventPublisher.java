@@ -2,6 +2,7 @@ package com.efaas.payment.kafka;
 
 import com.efaas.common.event.PaymentCompletedEvent;
 import com.efaas.common.event.PaymentFailedEvent;
+import com.efaas.common.event.PaymentRefundedEvent;
 import com.efaas.payment.entity.Payment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,5 +44,17 @@ public class PaymentEventPublisher {
         );
         kafkaTemplate.send(paymentsTopic, payment.getTenantId().toString(), event);
         log.info("Published PaymentFailedEvent for payment {} to topic {}", payment.getId(), paymentsTopic);
+    }
+
+    public void publishPaymentRefunded(Payment payment) {
+        PaymentRefundedEvent event = new PaymentRefundedEvent(
+                payment.getId(),
+                payment.getStripePaymentIntentId(),
+                payment.getTenantId().toString(),
+                payment.getAmount(),
+                payment.getCurrency()
+        );
+        kafkaTemplate.send(paymentsTopic, payment.getTenantId().toString(), event);
+        log.info("Published PaymentRefundedEvent for payment {} to topic {}", payment.getId(), paymentsTopic);
     }
 }

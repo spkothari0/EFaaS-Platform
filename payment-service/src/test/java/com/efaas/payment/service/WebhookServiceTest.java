@@ -141,6 +141,7 @@ class WebhookServiceTest {
         ArgumentCaptor<Payment> captor = ArgumentCaptor.forClass(Payment.class);
         verify(paymentRepository).save(captor.capture());
         assertThat(captor.getValue().getStatus()).isEqualTo(PaymentStatus.REFUNDED);
+        verify(eventPublisher).publishPaymentRefunded(any(Payment.class));
     }
 
     @Test
