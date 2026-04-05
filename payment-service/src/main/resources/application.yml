@@ -63,5 +63,6 @@ logging:
   level:
     root: INFO
     com.efaas: DEBUG
+    org.hibernate.engine.jdbc.env.internal.JdbcEnvironment: WARN
   pattern:
     console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

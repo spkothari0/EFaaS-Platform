@@ -186,6 +186,17 @@ services:
   # host: efaas-postgres-tenant, username: efaas, password: dev_password, database: tenants_db
   # repeat for each PostgreSQL instance with appropriate host and database
 
+  # Stripe CLI (Webhook Forwarding for local dev)
+  stripe-cli:
+    image: stripe/stripe-cli
+    container_name: efaas-stripe-cli
+    command: listen --forward-to host.docker.internal:8082/webhooks/stripe
+    volumes:
+      - stripe-cli-config:/root/.config/stripe
+    networks:
+      - efaas-network
+    restart: on-failure
+
   # TigerGraph Community Edition (Fraud Detection Knowledge Graph)
   # NOTE: Commented out — requires Docker Hub login (docker login) before pulling.
   # tigergraph:
@@ -231,6 +242,8 @@ volumes:
     driver: local
   pgadmin-data:
     driver: local
+  stripe-cli-config:
+    external: true
   tigergraph-data:
     driver: local
 

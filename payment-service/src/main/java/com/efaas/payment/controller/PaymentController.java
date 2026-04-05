@@ -34,7 +34,7 @@ public class PaymentController {
     })
     public PaymentResponse createPayment(
             @Valid @RequestBody CreatePaymentRequest request,
-            @Parameter(description = "Tenant ID injected by the gateway", required = true)
+            @Parameter(hidden = true, description = "Tenant ID for multi-tenancy (passed in X-Tenant-Id header)")
             @RequestHeader("X-Tenant-Id") UUID tenantId) {
         return paymentService.createPayment(request, tenantId);
     }
@@ -47,6 +47,7 @@ public class PaymentController {
     })
     public PaymentResponse getPayment(
             @PathVariable("id") UUID id,
+            @Parameter(hidden = true, description = "Tenant ID for multi-tenancy (passed in X-Tenant-Id header)")
             @RequestHeader("X-Tenant-Id") UUID tenantId) {
         return paymentService.getPayment(id, tenantId);
     }
@@ -61,6 +62,7 @@ public class PaymentController {
     })
     public PaymentResponse refundPayment(
             @PathVariable("id") UUID id,
+            @Parameter(hidden = true, description = "Tenant ID for multi-tenancy (passed in X-Tenant-Id header)")
             @RequestHeader("X-Tenant-Id") UUID tenantId) {
         return paymentService.refundPayment(id, tenantId);
     }

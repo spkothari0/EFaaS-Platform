@@ -1,0 +1,42 @@
+{
+  "info": {
+    "_postman_id": "08a8d481-3763-4abf-bd11-1ff2bcf058e7",
+    "name": "Finance EFaaS",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "17559906"
+  },
+  "item": [
+    {
+      "name": "Stripe payment completion",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"id\": \"evt_test_local_001\",\r\n    \"object\": \"event\",\r\n    \"api_version\": \"2023-10-16\",\r\n    \"type\": \"payment_intent.payment_failed\",\r\n    \"data\": {\r\n        \"object\": {\r\n            \"id\": \"pi_3TIbbEPYHIwikahR2NbY8h0g\",\r\n            \"object\": \"payment_intent\",\r\n            \"amount\": 5000,\r\n            \"currency\": \"usd\",\r\n            \"status\": \"succeeded\"\r\n        }\r\n    }\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8082/webhooks/stripe",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8082",
+          "path": [
+            "webhooks",
+            "stripe"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
