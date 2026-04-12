@@ -1,6 +1,6 @@
 package com.efaas.payment.controller;
 
-import com.efaas.payment.service.WebhookService;
+import com.efaas.payment.service.StripeWebhookService;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.net.Webhook;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @Hidden
 public class StripeWebhookController {
 
-    private final WebhookService webhookService;
+    private final StripeWebhookService stripeWebhookService;
 
     @Value("${stripe.webhook-secret}")
     private String webhookSecret;
@@ -48,7 +48,7 @@ public class StripeWebhookController {
         }
 
         try {
-            webhookService.processEvent(event);
+            stripeWebhookService.processEvent(event);
         } catch (Exception e) {
             // Return 500 so Stripe retries — do not swallow the error silently
             log.error("Error processing Stripe event {}: {}", event.getId(), e.getMessage(), e);

@@ -27,7 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class WebhookServiceTest {
+class StripeWebhookServiceTest {
 
     @Mock
     private WebhookEventRepository webhookEventRepository;
@@ -39,7 +39,7 @@ class WebhookServiceTest {
     private PaymentEventPublisher eventPublisher;
 
     @InjectMocks
-    private WebhookService webhookService;
+    private StripeWebhookService stripeWebhookService;
 
     private Payment completedPayment;
     private static final String STRIPE_PI_ID = "pi_test_123";
@@ -62,7 +62,7 @@ class WebhookServiceTest {
         Event event = mockEvent("payment_intent.succeeded", STRIPE_EVENT_ID);
         when(webhookEventRepository.existsByStripeEventId(STRIPE_EVENT_ID)).thenReturn(true);
 
-        webhookService.processEvent(event);
+        stripeWebhookService.processEvent(event);
 
         verify(paymentRepository, never()).findByStripePaymentIntentId(any());
         verify(webhookEventRepository, never()).save(any());
@@ -75,7 +75,7 @@ class WebhookServiceTest {
         when(paymentRepository.findByStripePaymentIntentId(STRIPE_PI_ID)).thenReturn(Optional.of(completedPayment));
         when(paymentRepository.save(any())).thenReturn(completedPayment);
 
-        webhookService.processEvent(event);
+        stripeWebhookService.processEvent(event);
 
         ArgumentCaptor<Payment> paymentCaptor = ArgumentCaptor.forClass(Payment.class);
         verify(paymentRepository).save(paymentCaptor.capture());
@@ -95,7 +95,7 @@ class WebhookServiceTest {
         when(paymentRepository.findByStripePaymentIntentId(STRIPE_PI_ID)).thenReturn(Optional.of(completedPayment));
         when(paymentRepository.save(any())).thenReturn(completedPayment);
 
-        webhookService.processEvent(event);
+        stripeWebhookService.processEvent(event);
 
         ArgumentCaptor<Payment> paymentCaptor = ArgumentCaptor.forClass(Payment.class);
         verify(paymentRepository).save(paymentCaptor.capture());
@@ -110,7 +110,7 @@ class WebhookServiceTest {
         when(webhookEventRepository.existsByStripeEventId(STRIPE_EVENT_ID)).thenReturn(false);
         when(paymentRepository.findByStripePaymentIntentId(STRIPE_PI_ID)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> webhookService.processEvent(event))
+        assertThatThrownBy(() -> stripeWebhookService.processEvent(event))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining(STRIPE_PI_ID);
 
@@ -136,7 +136,7 @@ class WebhookServiceTest {
         when(paymentRepository.findByStripePaymentIntentId(STRIPE_PI_ID)).thenReturn(Optional.of(payment));
         when(paymentRepository.save(any())).thenReturn(payment);
 
-        webhookService.processEvent(event);
+        stripeWebhookService.processEvent(event);
 
         ArgumentCaptor<Payment> captor = ArgumentCaptor.forClass(Payment.class);
         verify(paymentRepository).save(captor.capture());
@@ -159,7 +159,7 @@ class WebhookServiceTest {
         when(webhookEventRepository.existsByStripeEventId(STRIPE_EVENT_ID)).thenReturn(false);
         when(paymentRepository.findByStripePaymentIntentId(STRIPE_PI_ID)).thenReturn(Optional.of(payment));
 
-        webhookService.processEvent(event);
+        stripeWebhookService.processEvent(event);
 
         verify(paymentRepository, never()).save(any(Payment.class));
     }
@@ -169,7 +169,7 @@ class WebhookServiceTest {
         Event event = mockEvent("some.unknown.event", STRIPE_EVENT_ID);
         when(webhookEventRepository.existsByStripeEventId(STRIPE_EVENT_ID)).thenReturn(false);
 
-        webhookService.processEvent(event);
+        stripeWebhookService.processEvent(event);
 
         verify(paymentRepository, never()).findByStripePaymentIntentId(any());
         verify(webhookEventRepository).save(any());
