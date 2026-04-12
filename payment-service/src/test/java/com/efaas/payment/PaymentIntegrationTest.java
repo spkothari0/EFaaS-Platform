@@ -5,7 +5,7 @@ import com.efaas.payment.entity.PaymentStatus;
 import com.efaas.payment.entity.WebhookEvent;
 import com.efaas.payment.repository.PaymentRepository;
 import com.efaas.payment.repository.WebhookEventRepository;
-import com.efaas.payment.service.WebhookService;
+import com.efaas.payment.service.StripeWebhookService;
 import com.stripe.model.Event;
 import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.PaymentIntent;
@@ -73,7 +73,7 @@ class PaymentIntegrationTest {
     private WebhookEventRepository webhookEventRepository;
 
     @Autowired
-    private WebhookService webhookService;
+    private StripeWebhookService stripeWebhookService;
 
     private UUID tenantId;
 
@@ -100,7 +100,7 @@ class PaymentIntegrationTest {
         // Act: simulate receiving a payment_intent.succeeded webhook event
         Event event = mockPaymentIntentEvent(
                 "payment_intent.succeeded", "evt_integration_001", "pi_integration_test_001");
-        webhookService.processEvent(event);
+        stripeWebhookService.processEvent(event);
 
         // Assert: DB status updated to COMPLETED
         Payment updated = paymentRepository.findById(payment.getId()).orElseThrow();
@@ -130,7 +130,7 @@ class PaymentIntegrationTest {
 
         Event event = mockPaymentIntentEvent(
                 "payment_intent.succeeded", "evt_already_processed", "pi_dup_test");
-        webhookService.processEvent(event);
+        stripeWebhookService.processEvent(event);
 
         // Payment should still be PENDING — event was skipped
         Payment payment = paymentRepository.findByIdempotencyKey("idem-dup-test").orElseThrow();
@@ -151,7 +151,7 @@ class PaymentIntegrationTest {
 
         Event event = mockPaymentIntentEvent(
                 "payment_intent.payment_failed", "evt_integration_fail", "pi_integration_test_fail");
-        webhookService.processEvent(event);
+        stripeWebhookService.processEvent(event);
 
         Payment updated = paymentRepository.findByIdempotencyKey("integration-test-idem-fail").orElseThrow();
         assertThat(updated.getStatus()).isEqualTo(PaymentStatus.FAILED);
