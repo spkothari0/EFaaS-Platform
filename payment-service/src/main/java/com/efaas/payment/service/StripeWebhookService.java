@@ -18,7 +18,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class WebhookService {
+public class StripeWebhookService {
 
     private final WebhookEventRepository webhookEventRepository;
     private final PaymentRepository paymentRepository;
