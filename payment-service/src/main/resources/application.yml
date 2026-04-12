@@ -55,9 +55,16 @@ stripe:
   secret-key: ${STRIPE_SECRET_KEY}
   webhook-secret: ${STRIPE_WEBHOOK_SECRET}
 
+plaid:
+  client-id: ${PLAID_CLIENT_ID}
+  secret: ${PLAID_SECRET}
+  env: ${PLAID_ENV:sandbox}
+  webhook-url: ${PLAID_WEBHOOK_URL:http://localhost:8082/webhooks/plaid}
+
 kafka:
   topics:
     payments: payments-topic
+    plaid: plaid-topic
 
 logging:
   level:

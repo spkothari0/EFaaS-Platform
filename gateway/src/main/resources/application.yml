@@ -30,6 +30,10 @@ spring:
               uri: http://localhost:8082
               predicates:
                 - Path=/api/v1/payments,/api/v1/payments/**
+            - id: plaid-service
+              uri: http://localhost:8082
+              predicates:
+                - Path=/api/v1/plaid,/api/v1/plaid/**
             # - id: lending-service
             #   uri: http://localhost:8083
             #   predicates:

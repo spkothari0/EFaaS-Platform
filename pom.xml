@@ -34,8 +34,8 @@
         <spring-cloud.version>2025.0.0</spring-cloud.version>
 
         <!-- External APIs -->
-        <stripe-java.version>22.7.0</stripe-java.version>
-        <plaid.version>13.0.0</plaid.version>
+        <stripe-java.version>32.0.0</stripe-java.version>
+        <plaid.version>40.0.0</plaid.version>
         <alpaca-trade-api.version>2.5.2</alpaca-trade-api.version>
 
         <!-- Messaging & Event Streaming -->

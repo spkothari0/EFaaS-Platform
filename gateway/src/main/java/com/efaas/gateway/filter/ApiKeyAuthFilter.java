@@ -46,7 +46,8 @@ public class ApiKeyAuthFilter implements GlobalFilter, Ordered {
     private final ReactiveRedisTemplate<String, String> redisTemplate;
 
     private static final List<String> SKIP_PREFIXES = List.of(
-        "/actuator/", "/swagger-ui", "/v3/api-docs", "/webjars"
+        "/actuator/", "/swagger-ui", "/v3/api-docs", "/webjars",
+        "/webhooks/"  // Webhook endpoints use provider-specific auth (Stripe signature, Plaid JWT)
     );
 
     private static final String RATE_LIMIT_KEY_PREFIX = "rate_limit:";
