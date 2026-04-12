@@ -30,6 +30,23 @@ public class PaymentExceptionHandler {
         return problem;
     }
 
+    @ExceptionHandler(BankAccountNotFoundException.class)
+    public ProblemDetail handleBankAccountNotFound(BankAccountNotFoundException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setType(URI.create("https://efaas.io/errors/bank-account-not-found"));
+        problem.setProperty("errorCode", ex.getErrorCode());
+        return problem;
+    }
+
+    @ExceptionHandler(PlaidException.class)
+    public ProblemDetail handlePlaidError(PlaidException ex) {
+        log.error("Plaid API error [{}]: {}", ex.getErrorCode(), ex.getMessage());
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY, ex.getMessage());
+        problem.setType(URI.create("https://efaas.io/errors/plaid-error"));
+        problem.setProperty("errorCode", ex.getErrorCode());
+        return problem;
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleValidation(MethodArgumentNotValidException ex) {
         String detail = ex.getBindingResult().getFieldErrors().stream()
