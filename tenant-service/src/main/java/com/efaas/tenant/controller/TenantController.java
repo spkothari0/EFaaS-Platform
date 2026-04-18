@@ -34,6 +34,13 @@ public class TenantController {
     private final TenantService tenantService;
     private final ApiKeyService apiKeyService;
 
+    @GetMapping
+    @Operation(summary = "Get all tenants")
+    @ApiResponse(responseCode = "200", description = "List of all tenants")
+    public ResponseEntity<List<TenantDTO>> getAllTenants() {
+        return ResponseEntity.ok(tenantService.getAllTenants());
+    }
+
     @PostMapping
     @Operation(summary = "Create a new tenant")
     @ApiResponses({

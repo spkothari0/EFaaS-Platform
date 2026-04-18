@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -44,6 +45,11 @@ public class TenantService {
             saved.getId(), saved.getName(), saved.getEmail(), saved.getPlan().name()));
 
         return toDTO(saved);
+    }
+
+    @Transactional(readOnly = true)
+    public List<TenantDTO> getAllTenants() {
+        return tenantRepository.findAll().stream().map(this::toDTO).toList();
     }
 
     /**
