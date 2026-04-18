@@ -52,12 +52,12 @@ springdoc:
     tags-sorter: alpha
 
 stripe:
-  secret-key: ${STRIPE_SECRET_KEY}
-  webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+  secret-key: ${STRIPE_SECRET_KEY:sk_test_placeholder}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_placeholder}
 
 plaid:
-  client-id: ${PLAID_CLIENT_ID}
-  secret: ${PLAID_SECRET}
+  client-id: ${PLAID_CLIENT_ID:test-client-id}
+  secret: ${PLAID_SECRET:test-secret}
   env: ${PLAID_ENV:sandbox}
   webhook-url: ${PLAID_WEBHOOK_URL:http://localhost:8082/webhooks/plaid}
 
