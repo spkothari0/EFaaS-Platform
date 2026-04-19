@@ -71,17 +71,20 @@ class PlaidServiceTest {
         ItemPublicTokenExchangeResponse exchangeBody = new ItemPublicTokenExchangeResponse()
                 .accessToken("access-sandbox-token")
                 .itemId("item-abc123");
-        when(plaidApi.itemPublicTokenExchange(any())).thenReturn(mockCall(exchangeBody));
+        Call<ItemPublicTokenExchangeResponse> exchangeCall = mockCall(exchangeBody);
+        when(plaidApi.itemPublicTokenExchange(any())).thenReturn(exchangeCall);
 
         // ItemGet
         ItemWithConsentFields plaidItem = new ItemWithConsentFields().institutionId("ins_3");
         ItemGetResponse itemGetBody = new ItemGetResponse().item(plaidItem);
-        when(plaidApi.itemGet(any())).thenReturn(mockCall(itemGetBody));
+        Call<ItemGetResponse> itemGetCall = mockCall(itemGetBody);
+        when(plaidApi.itemGet(any())).thenReturn(itemGetCall);
 
         // InstitutionsGetById
         Institution institution = new Institution().name("Chase");
         InstitutionsGetByIdResponse instBody = new InstitutionsGetByIdResponse().institution(institution);
-        when(plaidApi.institutionsGetById(any())).thenReturn(mockCall(instBody));
+        Call<InstitutionsGetByIdResponse> instCall = mockCall(instBody);
+        when(plaidApi.institutionsGetById(any())).thenReturn(instCall);
 
         // AccountsGet
         AccountBase acc = new AccountBase()
@@ -91,7 +94,8 @@ class PlaidServiceTest {
                 .type(AccountType.DEPOSITORY)
                 .subtype(AccountSubtype.CHECKING);
         AccountsGetResponse accountsBody = new AccountsGetResponse().accounts(List.of(acc));
-        when(plaidApi.accountsGet(any())).thenReturn(mockCall(accountsBody));
+        Call<AccountsGetResponse> accountsCall = mockCall(accountsBody);
+        when(plaidApi.accountsGet(any())).thenReturn(accountsCall);
 
         // Repository stubs
         PlaidItem savedItem = PlaidItem.builder()
@@ -178,7 +182,8 @@ class PlaidServiceTest {
                 .decision(TransferAuthorizationDecision.DECLINED);
         TransferAuthorizationCreateResponse authBody =
                 new TransferAuthorizationCreateResponse().authorization(authorization);
-        when(plaidApi.transferAuthorizationCreate(any())).thenReturn(mockCall(authBody));
+        Call<TransferAuthorizationCreateResponse> authCall = mockCall(authBody);
+        when(plaidApi.transferAuthorizationCreate(any())).thenReturn(authCall);
 
         InitiateAchPaymentRequest request = new InitiateAchPaymentRequest(
                 accountId, 5000L, "usd", "desc", "Test User", "key-new");

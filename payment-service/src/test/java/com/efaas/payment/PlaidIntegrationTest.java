@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -65,7 +65,7 @@ class PlaidIntegrationTest {
     @Autowired PlaidAccountRepository plaidAccountRepository;
     @Autowired AchPaymentRepository achPaymentRepository;
 
-    @MockBean PlaidApi plaidApi;
+    @MockitoBean PlaidApi plaidApi;
 
     private final UUID tenantId = UUID.fromString("00000000-0000-0000-0000-000000000001");
 
@@ -83,7 +83,8 @@ class PlaidIntegrationTest {
         LinkTokenCreateResponse body = new LinkTokenCreateResponse()
                 .linkToken("link-sandbox-test-token")
                 .expiration(java.time.OffsetDateTime.now().plusHours(4));
-        when(plaidApi.linkTokenCreate(any())).thenReturn(successCall(body));
+        Call<LinkTokenCreateResponse> linkCall = successCall(body);
+        when(plaidApi.linkTokenCreate(any())).thenReturn(linkCall);
 
         mockMvc.perform(post("/api/v1/plaid/link-token")
                         .header("X-Tenant-Id", tenantId.toString())
@@ -150,13 +151,13 @@ class PlaidIntegrationTest {
         TransferAuthorization authorization = new TransferAuthorization()
                 .id("auth-123")
                 .decision(TransferAuthorizationDecision.APPROVED);
-        when(plaidApi.transferAuthorizationCreate(any()))
-                .thenReturn(successCall(new TransferAuthorizationCreateResponse()
-                        .authorization(authorization)));
+        Call<TransferAuthorizationCreateResponse> authCall = successCall(
+                new TransferAuthorizationCreateResponse().authorization(authorization));
+        when(plaidApi.transferAuthorizationCreate(any())).thenReturn(authCall);
 
         Transfer transfer = new Transfer().id("transfer-abc-123");
-        when(plaidApi.transferCreate(any()))
-                .thenReturn(successCall(new TransferCreateResponse().transfer(transfer)));
+        Call<TransferCreateResponse> transferCall = successCall(new TransferCreateResponse().transfer(transfer));
+        when(plaidApi.transferCreate(any())).thenReturn(transferCall);
 
         InitiateAchPaymentRequest achRequest = new InitiateAchPaymentRequest(
                 accountId, 5000L, "usd", "Integration test ACH", "Test User", "ach-idem-001");
@@ -189,18 +190,19 @@ class PlaidIntegrationTest {
 
     /** Stubs all Plaid API calls needed for the exchange-token flow. */
     private void stubExchangeFlow() throws Exception {
-        when(plaidApi.itemPublicTokenExchange(any()))
-                .thenReturn(successCall(new ItemPublicTokenExchangeResponse()
+        Call<ItemPublicTokenExchangeResponse> exchangeCall = successCall(
+                new ItemPublicTokenExchangeResponse()
                         .accessToken("access-sandbox-token")
-                        .itemId("item-abc123")));
+                        .itemId("item-abc123"));
+        when(plaidApi.itemPublicTokenExchange(any())).thenReturn(exchangeCall);
 
-        when(plaidApi.itemGet(any()))
-                .thenReturn(successCall(new ItemGetResponse()
-                        .item(new ItemWithConsentFields().institutionId("ins_3"))));
+        Call<ItemGetResponse> itemGetCall = successCall(new ItemGetResponse()
+                .item(new ItemWithConsentFields().institutionId("ins_3")));
+        when(plaidApi.itemGet(any())).thenReturn(itemGetCall);
 
-        when(plaidApi.institutionsGetById(any()))
-                .thenReturn(successCall(new InstitutionsGetByIdResponse()
-                        .institution(new Institution().name("Chase"))));
+        Call<InstitutionsGetByIdResponse> instCall = successCall(new InstitutionsGetByIdResponse()
+                .institution(new Institution().name("Chase")));
+        when(plaidApi.institutionsGetById(any())).thenReturn(instCall);
 
         AccountBase account = new AccountBase()
                 .accountId("acc-plaid-1")
@@ -208,8 +210,9 @@ class PlaidIntegrationTest {
                 .mask("1234")
                 .type(AccountType.DEPOSITORY)
                 .subtype(AccountSubtype.CHECKING);
-        when(plaidApi.accountsGet(any()))
-                .thenReturn(successCall(new AccountsGetResponse().accounts(List.of(account))));
+        Call<AccountsGetResponse> accountsCall = successCall(
+                new AccountsGetResponse().accounts(List.of(account)));
+        when(plaidApi.accountsGet(any())).thenReturn(accountsCall);
     }
 
     @SuppressWarnings("unchecked")
