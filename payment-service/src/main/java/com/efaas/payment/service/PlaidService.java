@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import retrofit2.Response;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -216,6 +217,92 @@ public class PlaidService {
         }
 
         log.info("Bank account {} unlinked for tenant {}", accountId, tenantId);
+    }
+
+    // ─── Real-time Balance ───────────────────────────────────────────────────────
+
+    @Transactional(readOnly = true)
+    public AccountBalanceResponse getAccountBalance(UUID tenantId, UUID accountId) {
+        PlaidAccount account = plaidAccountRepository.findByIdAndTenantId(accountId, tenantId)
+                .orElseThrow(() -> new BankAccountNotFoundException("Bank account not found: " + accountId));
+
+        String accessToken = account.getPlaidItem().getAccessToken();
+
+        AccountsBalanceGetRequestOptions options = new AccountsBalanceGetRequestOptions()
+                .accountIds(List.of(account.getPlaidAccountId()));
+
+        AccountsBalanceGetRequest request = new AccountsBalanceGetRequest()
+                .accessToken(accessToken)
+                .options(options);
+
+        try {
+            Response<AccountsGetResponse> response = plaidApi.accountsBalanceGet(request).execute();
+            assertSuccess(response, "accountsBalanceGet");
+
+            AccountBase plaidAccount = response.body().getAccounts().stream()
+                    .filter(a -> a.getAccountId().equals(account.getPlaidAccountId()))
+                    .findFirst()
+                    .orElseThrow(() -> new PlaidException("Account not found in Plaid response", "PLAID_ACCOUNT_NOT_FOUND"));
+
+            AccountBalance balance = plaidAccount.getBalances();
+            log.info("Fetched real-time balance for account {} tenant {}", accountId, tenantId);
+
+            return new AccountBalanceResponse(
+                    accountId,
+                    plaidAccount.getName(),
+                    plaidAccount.getMask(),
+                    balance.getAvailable(),
+                    balance.getCurrent(),
+                    balance.getLimit(),
+                    balance.getIsoCurrencyCode()
+            );
+        } catch (IOException e) {
+            throw new PlaidException("Network error calling Plaid accountsBalanceGet", "PLAID_NETWORK_ERROR", e);
+        }
+    }
+
+    // ─── 90-day Transaction History ──────────────────────────────────────────────
+
+    @Transactional(readOnly = true)
+    public TransactionsResponse getAccountTransactions(UUID tenantId, UUID accountId) {
+        PlaidAccount account = plaidAccountRepository.findByIdAndTenantId(accountId, tenantId)
+                .orElseThrow(() -> new BankAccountNotFoundException("Bank account not found: " + accountId));
+
+        String accessToken = account.getPlaidItem().getAccessToken();
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(90);
+
+        TransactionsGetRequestOptions options = new TransactionsGetRequestOptions()
+                .accountIds(List.of(account.getPlaidAccountId()));
+
+        TransactionsGetRequest request = new TransactionsGetRequest()
+                .accessToken(accessToken)
+                .startDate(startDate)
+                .endDate(endDate)
+                .options(options);
+
+        try {
+            Response<TransactionsGetResponse> response = plaidApi.transactionsGet(request).execute();
+            assertSuccess(response, "transactionsGet");
+
+            List<TransactionDto> transactions = response.body().getTransactions().stream()
+                    .map(t -> new TransactionDto(
+                            t.getTransactionId(),
+                            t.getName(),
+                            t.getMerchantName(),
+                            t.getAmount(),
+                            t.getDate(),
+                            t.getCategory(),
+                            t.getIsoCurrencyCode(),
+                            Boolean.TRUE.equals(t.getPending())
+                    ))
+                    .toList();
+
+            log.info("Fetched {} transactions for account {} tenant {}", transactions.size(), accountId, tenantId);
+            return new TransactionsResponse(accountId, transactions, response.body().getTotalTransactions());
+        } catch (IOException e) {
+            throw new PlaidException("Network error calling Plaid transactionsGet", "PLAID_NETWORK_ERROR", e);
+        }
     }
 
     // ─── Initiate ACH Payment ────────────────────────────────────────────────────

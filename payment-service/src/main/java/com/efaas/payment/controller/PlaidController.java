@@ -63,6 +63,35 @@ public class PlaidController {
         return plaidService.getLinkedAccounts(tenantId);
     }
 
+    @GetMapping("/accounts/{accountId}/balance")
+    @Operation(summary = "Get real-time balance for a linked account",
+            description = "Fetches live balance directly from Plaid (bypasses cache). " +
+                    "Returns available, current, and limit balances in the account currency.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Balance retrieved"),
+            @ApiResponse(responseCode = "404", description = "Account not found")
+    })
+    public AccountBalanceResponse getBalance(
+            @PathVariable("accountId") UUID accountId,
+            @Parameter(hidden = true)
+            @RequestHeader("X-Tenant-Id") UUID tenantId) {
+        return plaidService.getAccountBalance(tenantId, accountId);
+    }
+
+    @GetMapping("/accounts/{accountId}/transactions")
+    @Operation(summary = "Get 90-day transaction history for a linked account",
+            description = "Fetches the last 90 days of transactions from Plaid for the specified account.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Transactions retrieved"),
+            @ApiResponse(responseCode = "404", description = "Account not found")
+    })
+    public TransactionsResponse getTransactions(
+            @PathVariable("accountId") UUID accountId,
+            @Parameter(hidden = true)
+            @RequestHeader("X-Tenant-Id") UUID tenantId) {
+        return plaidService.getAccountTransactions(tenantId, accountId);
+    }
+
     @DeleteMapping("/accounts/{accountId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Unlink a bank account",
