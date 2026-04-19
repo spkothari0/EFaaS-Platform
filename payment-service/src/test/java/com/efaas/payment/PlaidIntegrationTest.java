@@ -1,7 +1,6 @@
 package com.efaas.payment;
 
 import com.efaas.payment.dto.plaid.*;
-import com.efaas.payment.entity.*;
 import com.efaas.payment.repository.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.plaid.client.model.*;
@@ -145,7 +144,7 @@ class PlaidIntegrationTest {
                 .content(objectMapper.writeValueAsString(
                         new ExchangeTokenRequest("public-sandbox-token"))));
 
-        UUID accountId = plaidAccountRepository.findActiveByTenantId(tenantId).get(0).getId();
+        UUID accountId = plaidAccountRepository.findActiveByTenantId(tenantId).getFirst().getId();
 
         // Stub transfer auth + transfer create
         TransferAuthorization authorization = new TransferAuthorization()
@@ -172,6 +171,73 @@ class PlaidIntegrationTest {
                 .andExpect(jsonPath("$.amount").value(5000));
 
         assertThat(achPaymentRepository.findByPlaidTransferId("transfer-abc-123")).isPresent();
+    }
+
+    // ─── GET /api/v1/plaid/accounts/{id}/balance ─────────────────────────────────
+
+    @Test
+    void getBalance_returnsRealTimePlaidBalance() throws Exception {
+        stubExchangeFlow();
+        mockMvc.perform(post("/api/v1/plaid/exchange-token")
+                .header("X-Tenant-Id", tenantId.toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(
+                        new ExchangeTokenRequest("public-sandbox-token"))));
+
+        UUID accountId = plaidAccountRepository.findActiveByTenantId(tenantId).getFirst().getId();
+
+        AccountBalance balance = new AccountBalance()
+                .available(2500.00).current(3000.00).isoCurrencyCode("USD");
+        AccountBase plaidAccount = new AccountBase()
+                .accountId("acc-plaid-1").name("Checking Account").mask("1234")
+                .balances(balance);
+        Call<AccountsGetResponse> balanceCall = successCall(new AccountsGetResponse().accounts(List.of(plaidAccount)));
+        when(plaidApi.accountsBalanceGet(any())).thenReturn(balanceCall);
+
+        mockMvc.perform(get("/api/v1/plaid/accounts/{id}/balance", accountId)
+                        .header("X-Tenant-Id", tenantId.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.available").value(2500.00))
+                .andExpect(jsonPath("$.current").value(3000.00))
+                .andExpect(jsonPath("$.isoCurrencyCode").value("USD"));
+    }
+
+    // ─── GET /api/v1/plaid/accounts/{id}/transactions ────────────────────────────
+
+    @Test
+    void getTransactions_returns90DayHistory() throws Exception {
+        stubExchangeFlow();
+        mockMvc.perform(post("/api/v1/plaid/exchange-token")
+                .header("X-Tenant-Id", tenantId.toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(
+                        new ExchangeTokenRequest("public-sandbox-token"))));
+
+        UUID accountId = plaidAccountRepository.findActiveByTenantId(tenantId).getFirst().getId();
+
+        // Sandbox credentials simulate user_good / pass_good flow: transactions match expected sandbox data
+        Transaction tx = new Transaction()
+                .transactionId("tx-sandbox-001")
+                .name("Coffee Shop")
+                .merchantName("Starbucks")
+                .amount(4.55)
+                .date(java.time.LocalDate.now().minusDays(3))
+                .category(List.of("Food and Drink", "Coffee Shop"))
+                .isoCurrencyCode("USD")
+                .pending(false);
+
+        Call<TransactionsGetResponse> txCall = successCall(new TransactionsGetResponse()
+                .transactions(List.of(tx))
+                .totalTransactions(1));
+        when(plaidApi.transactionsGet(any())).thenReturn(txCall);
+
+        mockMvc.perform(get("/api/v1/plaid/accounts/{id}/transactions", accountId)
+                        .header("X-Tenant-Id", tenantId.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.transactions").isArray())
+                .andExpect(jsonPath("$.transactions[0].transactionId").value("tx-sandbox-001"))
+                .andExpect(jsonPath("$.transactions[0].merchantName").value("Starbucks"))
+                .andExpect(jsonPath("$.totalTransactions").value(1));
     }
 
     // ─── Plaid webhook ───────────────────────────────────────────────────────────

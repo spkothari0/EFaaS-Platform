@@ -113,7 +113,7 @@ class PlaidServiceTest {
         LinkedAccountsResponse result = plaidService.exchangePublicToken(tenantId, "public-sandbox-xyz");
 
         assertThat(result.accounts()).hasSize(1);
-        assertThat(result.accounts().get(0).name()).isEqualTo("Checking");
+        assertThat(result.accounts().getFirst().name()).isEqualTo("Checking");
         verify(plaidItemRepository).save(any());
         verify(plaidAccountRepository).saveAll(any());
         verify(eventPublisher).publishBankAccountLinked(any());
@@ -191,6 +191,83 @@ class PlaidServiceTest {
         assertThatThrownBy(() -> plaidService.initiateAchPayment(tenantId, request))
                 .isInstanceOf(PlaidException.class)
                 .hasMessageContaining("declined");
+    }
+
+    // ─── getAccountBalance ───────────────────────────────────────────────────────
+
+    @Test
+    void getAccountBalance_returnsBalanceFromPlaid() throws Exception {
+        UUID accountId = UUID.randomUUID();
+        PlaidItem item = PlaidItem.builder().id(UUID.randomUUID())
+                .accessToken("access-sandbox-token").build();
+        PlaidAccount account = PlaidAccount.builder().id(accountId).tenantId(tenantId)
+                .plaidItem(item).plaidAccountId("acc-plaid-1").active(true).build();
+
+        when(plaidAccountRepository.findByIdAndTenantId(accountId, tenantId))
+                .thenReturn(Optional.of(account));
+
+        AccountBalance balance = new AccountBalance()
+                .available(1500.00).current(1800.00).limit(null).isoCurrencyCode("USD");
+        AccountBase plaidAccount = new AccountBase()
+                .accountId("acc-plaid-1").name("Checking").mask("1234")
+                .balances(balance);
+        Call<AccountsGetResponse> balanceCall = mockCall(
+                new AccountsGetResponse().accounts(List.of(plaidAccount)));
+        when(plaidApi.accountsBalanceGet(any())).thenReturn(balanceCall);
+
+        AccountBalanceResponse result = plaidService.getAccountBalance(tenantId, accountId);
+
+        assertThat(result.available()).isEqualTo(1500.00);
+        assertThat(result.current()).isEqualTo(1800.00);
+        assertThat(result.isoCurrencyCode()).isEqualTo("USD");
+        assertThat(result.accountId()).isEqualTo(accountId);
+    }
+
+    @Test
+    void getAccountBalance_accountNotFound_throws() {
+        UUID accountId = UUID.randomUUID();
+        when(plaidAccountRepository.findByIdAndTenantId(accountId, tenantId))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> plaidService.getAccountBalance(tenantId, accountId))
+                .isInstanceOf(BankAccountNotFoundException.class);
+    }
+
+    // ─── getAccountTransactions ──────────────────────────────────────────────────
+
+    @Test
+    void getAccountTransactions_returns90DaysOfTransactions() throws Exception {
+        UUID accountId = UUID.randomUUID();
+        PlaidItem item = PlaidItem.builder().id(UUID.randomUUID())
+                .accessToken("access-sandbox-token").build();
+        PlaidAccount account = PlaidAccount.builder().id(accountId).tenantId(tenantId)
+                .plaidItem(item).plaidAccountId("acc-plaid-1").active(true).build();
+
+        when(plaidAccountRepository.findByIdAndTenantId(accountId, tenantId))
+                .thenReturn(Optional.of(account));
+
+        Transaction tx = new Transaction()
+                .transactionId("tx-001")
+                .name("Amazon")
+                .merchantName("Amazon")
+                .amount(49.99)
+                .date(java.time.LocalDate.now().minusDays(5))
+                .category(List.of("Shopping", "General Merchandise"))
+                .isoCurrencyCode("USD")
+                .pending(false);
+
+        Call<TransactionsGetResponse> txCall = mockCall(
+                new TransactionsGetResponse()
+                        .transactions(List.of(tx))
+                        .totalTransactions(1));
+        when(plaidApi.transactionsGet(any())).thenReturn(txCall);
+
+        TransactionsResponse result = plaidService.getAccountTransactions(tenantId, accountId);
+
+        assertThat(result.transactions()).hasSize(1);
+        assertThat(result.transactions().getFirst().transactionId()).isEqualTo("tx-001");
+        assertThat(result.transactions().getFirst().merchantName()).isEqualTo("Amazon");
+        assertThat(result.totalTransactions()).isEqualTo(1);
     }
 
     // ─── Helper ──────────────────────────────────────────────────────────────────
