@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Plaid Link Test</title>
+</head>
+<body>
+  <h2>Plaid Link Tester</h2>
+
+  <label>Paste Link Token:</label><br>
+  <input id="linkToken" style="width:500px" placeholder="link-sandbox-..." /><br><br>
+
+  <button onclick="openPlaidLink()">Open Plaid Link</button>
+
+  <h3>Public Token:</h3>
+  <pre id="publicToken">—</pre>
+
+  <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+  <script>
+    function openPlaidLink() {
+      const token = document.getElementById('linkToken').value.trim();
+      if (!token) { alert('Paste a link token first'); return; }
+
+      Plaid.create({
+        token,
+        onSuccess: (public_token) => {
+          document.getElementById('publicToken').textContent = public_token;
+        },
+        onExit: (err) => {
+          if (err) console.error(err);
+        }
+      }).open();
+    }
+  </script>
+</body>
+</html>

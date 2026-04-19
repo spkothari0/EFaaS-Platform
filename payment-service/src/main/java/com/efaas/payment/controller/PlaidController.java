@@ -73,7 +73,7 @@ public class PlaidController {
             @ApiResponse(responseCode = "404", description = "Account not found")
     })
     public void unlinkAccount(
-            @PathVariable UUID accountId,
+            @PathVariable("accountId") UUID accountId,
             @Parameter(hidden = true)
             @RequestHeader("X-Tenant-Id") UUID tenantId) {
         plaidService.unlinkAccount(tenantId, accountId);

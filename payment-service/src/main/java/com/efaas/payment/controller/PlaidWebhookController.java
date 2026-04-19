@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@Hidden
 public class PlaidWebhookController {
 
     private final PlaidWebhookService webhookService;
