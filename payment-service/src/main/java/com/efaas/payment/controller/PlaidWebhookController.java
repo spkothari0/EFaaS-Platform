@@ -1,7 +1,6 @@
 package com.efaas.payment.controller;
 
 import com.efaas.payment.service.PlaidWebhookService;
-import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +14,13 @@ import org.springframework.web.bind.annotation.*;
  * webhook verification (plaid-verification-header). Skipped here for simplicity.
  *
  * Call this endpoint directly on port 8082 (not via the gateway) when testing locally.
- * Use the Plaid sandbox fire_webhook endpoint to simulate events.
+ *
+ * To test in sandbox:
+ *   1. Go to https://dashboard.plaid.com/transfer, find your transfer, click "Next Event"
+ *      to advance its status (pending → posted).
+ *   2. POST the following to this endpoint to trigger the sync:
+ *      POST http://localhost:8082/webhooks/plaid
+ *      { "webhook_type": "TRANSFER", "webhook_code": "TRANSFER_EVENTS_PENDING" }
  */
 @Slf4j
 @RestController
