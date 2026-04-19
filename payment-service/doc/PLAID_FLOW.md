@@ -427,6 +427,35 @@ In production you'd notify Alex via email/push to re-link his account before it 
 
 ## Complete Flow Summary
 
+---
+
+## Sandbox Testing — Completing a Transfer Without Real Banking
+
+In production, Plaid advances the transfer status automatically when the bank processes it
+and fires the webhook to your server. In sandbox there is no real bank, so you do it manually:
+
+**Step 1 — Advance the transfer status on Plaid's side:**
+Go to https://dashboard.plaid.com/transfer → find your transfer → click **"Next Event"**.
+This moves it from `pending` → `posted` on Plaid's servers.
+
+**Step 2 — Trigger your webhook handler:**
+```
+POST http://localhost:8082/webhooks/plaid
+Content-Type: application/json
+
+{
+  "webhook_type": "TRANSFER",
+  "webhook_code": "TRANSFER_EVENTS_PENDING"
+}
+```
+Your service calls `transferEventSync`, picks up the `posted` event from Step 1,
+and updates `ach_payments.status` → `POSTED` in the DB.
+
+> In production you never do either step — Plaid does Step 1 (real bank settles),
+> then fires Step 2 automatically to your webhook URL.
+
+---
+
 ```
 STEP  YOUR API ENDPOINT              PLAID CALLS MADE                 DB CHANGES
 ───── ──────────────────────────     ──────────────────────────────── ─────────────────────────────
