@@ -102,6 +102,12 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- Keeps the original JAR with classes at root level so Failsafe
+                         integration tests can find them. The runnable fat JAR is
+                         produced as lending-service-*-exec.jar instead. -->
+                    <classifier>exec</classifier>
+                </configuration>
             </plugin>
         </plugins>
     </build>
