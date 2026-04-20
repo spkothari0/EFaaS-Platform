@@ -52,7 +52,7 @@ public class LoanController {
     })
     public LoanDetailsResponse getLoan(
             @Parameter(hidden = true) @RequestHeader("X-Tenant-Id") UUID tenantId,
-            @Parameter(description = "Loan ID", required = true) @PathVariable UUID loanId) {
+            @Parameter(description = "Loan ID", required = true) @PathVariable("loanId") UUID loanId) {
         return loanService.getLoan(tenantId, loanId);
     }
 
@@ -68,7 +68,7 @@ public class LoanController {
     })
     public RepaymentScheduleResponse getRepaymentSchedule(
             @Parameter(hidden = true) @RequestHeader("X-Tenant-Id") UUID tenantId,
-            @Parameter(description = "Loan ID", required = true) @PathVariable UUID loanId) {
+            @Parameter(description = "Loan ID", required = true) @PathVariable("loanId") UUID loanId) {
         return loanService.getRepaymentSchedule(tenantId, loanId);
     }
 
@@ -85,7 +85,7 @@ public class LoanController {
     })
     public LoanDetailsResponse disburseLoan(
             @Parameter(hidden = true) @RequestHeader("X-Tenant-Id") UUID tenantId,
-            @Parameter(description = "Loan ID", required = true) @PathVariable UUID loanId) {
+            @Parameter(description = "Loan ID", required = true) @PathVariable("loanId") UUID loanId) {
         return loanService.disburseLoan(tenantId, loanId);
     }
 }
