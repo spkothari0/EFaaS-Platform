@@ -45,8 +45,12 @@ public class PaymentService {
                 .setDescription(request.description())
                 .putMetadata("tenantId", tenantId.toString())
                 .putMetadata("idempotencyKey", request.idempotencyKey())
-                // capture_method=manual would require separate capture; automatic captures immediately
                 .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC)
+                .setAutomaticPaymentMethods(
+                        PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
+                                .setEnabled(true)
+                                .setAllowRedirects(PaymentIntentCreateParams.AutomaticPaymentMethods.AllowRedirects.NEVER)
+                                .build())
                 .build();
 
         RequestOptions requestOptions = RequestOptions.builder()
