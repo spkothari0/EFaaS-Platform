@@ -25,8 +25,8 @@ public class FinancialProfileController {
 
     @GetMapping("/financial-profile/{accountId}")
     public FinancialProfile getFinancialProfile(
-            @PathVariable UUID accountId,
-            @RequestParam UUID tenantId) {
+            @PathVariable("accountId") UUID accountId,
+            @RequestParam("tenantId") UUID tenantId) {
         log.debug("Internal financial profile request: accountId={}, tenantId={}", accountId, tenantId);
         return financialProfileService.buildProfile(tenantId, accountId);
     }

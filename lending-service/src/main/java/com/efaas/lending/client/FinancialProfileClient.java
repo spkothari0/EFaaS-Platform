@@ -18,8 +18,10 @@ public class FinancialProfileClient {
 
     private final RestClient restClient;
 
-    public FinancialProfileClient(@Value("${payment-service.base-url}") String baseUrl) {
-        this.restClient = RestClient.builder()
+    public FinancialProfileClient(
+            @Value("${payment-service.base-url}") String baseUrl,
+            RestClient.Builder builder) {
+        this.restClient = builder
                 .baseUrl(baseUrl)
                 .build();
     }
@@ -27,7 +29,10 @@ public class FinancialProfileClient {
     public FinancialProfile getFinancialProfile(UUID tenantId, UUID accountId) {
         log.debug("Fetching financial profile for account={} tenant={}", accountId, tenantId);
         return restClient.get()
-                .uri("/internal/financial-profile/{accountId}?tenantId={tenantId}", accountId, tenantId)
+                .uri(uriBuilder -> uriBuilder
+                        .path("/internal/financial-profile/{accountId}")
+                        .queryParam("tenantId", tenantId)
+                        .build(accountId))
                 .retrieve()
                 .body(FinancialProfile.class);
     }
