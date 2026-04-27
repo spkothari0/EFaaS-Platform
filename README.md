@@ -2,9 +2,6 @@
 
 [![Java](https://img.shields.io/badge/Java-17%2B-blue)](https://www.java.com/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3-green)](https://spring.io/projects/spring-boot)
-[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
-
-> A production-grade, enterprise-scale fintech platform built with Spring Boot, Kafka, PostgreSQL, and TigerGraph. This is a portfolio project demonstrating advanced microservices architecture, multi-tenancy, and fraud detection using knowledge graphs.
 
 ## 🎯 Overview
 
@@ -51,14 +48,6 @@ EFaaS (Embedded Finance-as-a-Service) is a platform that enables businesses to e
 **Kafka**
 
 ![alt text](images/kafka.png)
-
-**Services:**
-- **Gateway**: Request routing, authentication, rate limiting (port 8080)
-- **Tenant Service**: Multi-tenant management, API keys (port 8081)
-- **Payment Service**: Stripe + Plaid integration (port 8082)
-- **Lending Service**: Credit scoring, loans (port 8083)
-- **Investment Service**: Alpaca paper trading (port 8084)
-- **Fraud Service**: TigerGraph-powered fraud detection (port 8085)
 
 ## 🛠️ Tech Stack
 
@@ -125,9 +114,7 @@ cd tenant-service && mvn spring-boot:run
 ```
 
 Services will be available at:
-- **Gateway**: http://localhost:8080
-- **Tenant Service**: http://localhost:8081
-- **API Docs**: http://localhost:8081/swagger-ui.html
+- **API Docs**: http://localhost:8080/swagger-ui.html
 
 ## 📚 API Examples
 
@@ -165,8 +152,7 @@ curl -H "X-API-Key: efaas_live_abcdef123456..." \
 ## 📖 Documentation
 
 - **[DEMO.md](DEMO.md)** - Walk-through of key features with curl commands
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Development guidelines
-- **[Architecture Decision Records](docs/adr/)** - Design rationale (Week 2+)
+- **[Architecture Decision Records](docs/)** - Design rationale (Week 2+)
 - **Swagger UI**: http://localhost:8081/swagger-ui.html
 
 ## 🗂️ Project Structure
@@ -231,15 +217,6 @@ mvn clean verify
 mvn test -pl tenant-service
 ```
 
-## 🔄 Development Workflow
-
-1. **Feature branches**: `git checkout -b feature/your-feature`
-2. **Test locally**: `mvn clean verify`
-3. **Commit**: Follow conventional commits (feat:, fix:, docs:, etc.)
-4. **Pull request**: Submit for code review
-5. **CI/CD**: GitHub Actions validates build & tests
-6. **Merge & Deploy**: Automatically deployed to staging/prod
-
 ## 📈 Build Timeline
 
 | Week | Focus | Deliverables |
@@ -253,20 +230,7 @@ mvn test -pl tenant-service
 | 7 | Polish | Documentation, monitoring, tests |
 | 8 | Deploy | CI/CD, production setup |
 
-## 🤝 Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
 ## 📝 License
 
 MIT License - see [LICENSE](LICENSE) file.
-
-## 👨‍💻 Author
-
-Built as a portfolio project to demonstrate enterprise fintech backend engineering.
-
-**Contact**: [Your Name] - [Your Email/GitHub]
-
 ---
-
-**Last Updated**: March 2024 | **Status**: Week 1 Complete ✅
