@@ -2,12 +2,10 @@ package com.efaas.tenant.service;
 
 import com.efaas.common.dto.ApiKeyDTO;
 import com.efaas.common.dto.ApiKeyValidationResponse;
-import com.efaas.common.event.ApiKeyGeneratedEvent;
 import com.efaas.common.exception.InvalidApiKeyException;
 import com.efaas.common.exception.TenantNotFoundException;
 import com.efaas.tenant.domain.ApiKey;
 import com.efaas.tenant.domain.Tenant;
-import com.efaas.tenant.event.TenantEventPublisher;
 import com.efaas.tenant.repository.ApiKeyRepository;
 import com.efaas.tenant.repository.TenantRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +33,6 @@ public class ApiKeyService {
 
     private final ApiKeyRepository apiKeyRepository;
     private final TenantRepository tenantRepository;
-    private final TenantEventPublisher eventPublisher;
     private static final String API_KEY_PREFIX = "efaas_live_";
     private static final int API_KEY_LENGTH = 32;  // 32 random bytes = 43 Base64 chars
 
@@ -62,9 +59,7 @@ public class ApiKeyService {
         ApiKey saved = apiKeyRepository.save(apiKey);
         log.info("API key generated for tenant: tenantId={}, keyId={}, maskedKey={}", tenantId, saved.getId(), maskedKey);
 
-        Tenant tenant = tenantRepository.findById(tenantId).orElseThrow();
-        eventPublisher.publishApiKeyGenerated(new ApiKeyGeneratedEvent(
-            tenantId, saved.getId(), maskedKey, tenant.getPlan().name()));
+        tenantRepository.findById(tenantId).orElseThrow();
 
         return ApiKeyDTO.builder()
             .id(saved.getId())

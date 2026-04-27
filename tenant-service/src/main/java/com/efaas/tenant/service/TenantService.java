@@ -1,10 +1,8 @@
 package com.efaas.tenant.service;
 
 import com.efaas.common.dto.TenantDTO;
-import com.efaas.common.event.TenantCreatedEvent;
 import com.efaas.common.exception.TenantNotFoundException;
 import com.efaas.tenant.domain.Tenant;
-import com.efaas.tenant.event.TenantEventPublisher;
 import com.efaas.tenant.repository.TenantRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +23,6 @@ import java.util.UUID;
 public class TenantService {
 
     private final TenantRepository tenantRepository;
-    private final TenantEventPublisher eventPublisher;
 
     /**
      * Create a new tenant.
@@ -40,9 +37,6 @@ public class TenantService {
 
         Tenant saved = tenantRepository.save(tenant);
         log.info("Tenant created: id={}, name={}, email={}, plan={}", saved.getId(), saved.getName(), saved.getEmail(), saved.getPlan());
-
-        eventPublisher.publishTenantCreated(new TenantCreatedEvent(
-            saved.getId(), saved.getName(), saved.getEmail(), saved.getPlan().name()));
 
         return toDTO(saved);
     }
