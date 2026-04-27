@@ -43,7 +43,8 @@ public class LoanService {
         FinancialProfile profile = financialProfileClient.getFinancialProfile(tenantId, request.plaidAccountId());
 
         // 2. Score
-        int score = 701; //creditScoringEngine.score(profile, request.requestedAmountCents(), request.termMonths());
+        //int score = 701;          // for testing
+        int score = creditScoringEngine.score(profile, request.requestedAmountCents(), request.termMonths());
         LoanStatus status = determineStatus(score);
         String reason = buildDecisionReason(score, status);
 
